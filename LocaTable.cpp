@@ -26,25 +26,35 @@ LocaTable::LocaTable(const char* fileName, bool isShort, uint16_t numGlyphs){
 
     char* locaContent = readNumberBytesFromFile(fileName, mOffset, count);
 
-    mGlyphRecords = (GlyphRecord**) malloc(sizeof(void*) * mNumGlyphs);
+    mGlyphRecords = (GlyphRecord**) malloc(sizeof(void*) * (mNumGlyphs + 1));
 
-    int preOffset = 0;
+    printf("mOffset: %u\n",mOffset);
     for (int i = 0; i < mNumGlyphs; ++i) {
         GlyphRecord* record = (GlyphRecord*)malloc(sizeof(GlyphRecord));
         if(isShortVersion){
             record->offset = readTwoBytesAsUShort(locaContent + offsetInternal);
-            record->length = record->offset - preOffset;
             offsetInternal += 2;
-            preOffset = record->offset;
+            uint16_t  nextOffset = readTwoBytesAsUShort(locaContent + offsetInternal);
+            record->length = nextOffset - record->offset;
+
         } else {
             record->offset = readFourBytesAsUInt(locaContent + offsetInternal);
-            record->length = record->offset - preOffset;
             offsetInternal += 4;
-            preOffset = record->offset;
+
+            uint16_t  nextOffset = readTwoBytesAsUShort(locaContent + offsetInternal);
+            record->length = nextOffset - record->offset;
         }
-        if(i < 20)
-            printf("offset: %u, length: %u\n", record->offset, record->length);
+        mGlyphRecords[i] = record;
+        if(i < 20){
+            printf("Offset: %u, Length: %u\n",record->offset, record->length);
+        }
     }
+
+    GlyphRecord* record = (GlyphRecord*)malloc(sizeof(GlyphRecord));
+    record->offset = offsetInternal;
+    record->length = count - offsetInternal;
+    mGlyphRecords[mNumGlyphs] = record;
+
 
     free(locaContent);
     locaContent = NULL;

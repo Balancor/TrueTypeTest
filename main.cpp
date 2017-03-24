@@ -17,11 +17,12 @@ int main() {
 
     HeadTable* headTable = new HeadTable(FONT_FILENAME);
 //    headTable->dump();
+    printf("main glyph mIndexToLocFormat: %u\n", headTable->mIndexToLocFormat);
 
     MaxpTable *maxpTable = new MaxpTable(FONT_FILENAME);
 //    maxpTable->dump();
 
-    LocaTable* locaTable = new LocaTable(FONT_FILENAME, headTable->mIndexToLocFormat , maxpTable->mNumGlyphs);
+    LocaTable* locaTable = new LocaTable(FONT_FILENAME, headTable->mIndexToLocFormat == 0 , maxpTable->mNumGlyphs);
 
     return 0;
 }
