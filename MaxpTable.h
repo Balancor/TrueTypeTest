@@ -8,7 +8,7 @@
 #include "Base.h"
 
 class MaxpTable : public Table {
-protected:
+public:
     uint32_t mMaxpTableVersion;
     uint16_t mNumGlyphs;
     uint16_t mMaxPoints;
@@ -24,12 +24,15 @@ protected:
     uint16_t mMaxSizeOfInstructions;
     uint16_t mMaxComponentElements;
     uint16_t mMaxComponentDepth;
+
+
 public:
     MaxpTable(const char* fileName);
     void setOffset(uint32_t offset){
         mOffset = offset;
     }
     void dump();
+    friend class LocaTable;
 };
 
 

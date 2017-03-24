@@ -14,15 +14,22 @@ typedef struct {
 
 class LocaTable : public Table{
 
-private:
+public:
     bool isShortVersion;
+    uint16_t mNumGlyphs;
     GlyphRecord** mGlyphRecords;
 
 public:
-    LocaTable(const char* fileName);
+    LocaTable(const char* fileName, bool isShort, uint16_t numGlyphs);
 
+    void setOffset(uint32_t offset){
+        mOffset = offset;
+    }
     uint16_t getGlyphOffset(uint16_t gid);
     uint16_t getGlyphLength(uint16_t gid);
+
+    friend class HeadTable;
+    friend class MaxpTable;
 };
 
 

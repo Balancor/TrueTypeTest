@@ -10,7 +10,7 @@
 
 class HeadTable : public Table {
 
-private:
+public:
     uint32_t mVersion;
     uint32_t mFontVersion;
     uint32_t mCheckSumAdjustment;
@@ -29,6 +29,7 @@ private:
     int16_t mIndexToLocFormat;
     int16_t mGlyphDataFormat;
 
+
 public:
     HeadTable(const char* fileName);
 
@@ -37,7 +38,7 @@ public:
     }
 
     void dump();
-
+    friend class LocaTable;
 };
 
 

@@ -11,13 +11,16 @@ MaxpTable::MaxpTable(const char* fileName){
         printf("Cannot get the Cmap Record from %s\n", fileName);
         return ;
     }
+
     this->mOffset = maxpRecord->offset;
     char* content = readNumberBytesFromFile(fileName, mOffset, MAXP_TABLE_LENGTH);
 
+    mLength = 0;
     mMaxpTableVersion = readFourBytesAsUInt(content + mLength);
     mLength += 4;
     mNumGlyphs = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
+
 
     if(mMaxpTableVersion == 0x5000){
         free(content);
@@ -51,7 +54,7 @@ MaxpTable::MaxpTable(const char* fileName){
     mLength += 2;
     mMaxComponentDepth = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-
+    printf("MaxpTable Constructor END\n");
     free(content);
     content = NULL;
 }
