@@ -27,6 +27,7 @@ public:
     DirectoryTable(const char* fontFileName);
     TableRecord* getTableRecord(uint32_t tag);
     ~DirectoryTable(){
+        printf("Destory Constructor\n");
         if(mTableRecords != NULL){
             for (int i = 0; i < mNumTables; ++i) {
                 TableRecord* record = mTableRecords[i];
@@ -38,6 +39,7 @@ public:
 };
 
 
+
 class Table{
 protected:
     uint32_t mOffset;
@@ -46,8 +48,7 @@ protected:
 
 public:
     ~Table(){
-        if(mRawData != NULL)
-            free((void*)mRawData);
+
     }
 
     virtual void setOffset(uint32_t offset) = 0;

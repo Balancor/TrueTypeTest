@@ -5,10 +5,9 @@
 #include <cstring>
 #include "SegmentMappingTable.h"
 #include "utils.h"
-#include "CmapTable.h"
+#include "GTrueType_defs.h"
 
 SegmentMappingTable::SegmentMappingTable(const char* fileName, uint16_t platformId, uint16_t encodingId){
-    printf("SegmentMappingTable Constructor\n");
     CmapTable* cmapTable = getCmapTable(fileName);
     EncodingTableRecord* tableRecord = cmapTable->getEncodingRecord(platformId, encodingId);
     if(tableRecord == NULL){
@@ -17,8 +16,7 @@ SegmentMappingTable::SegmentMappingTable(const char* fileName, uint16_t platform
     }
 
     this->mOffset = cmapTable->mOffset + tableRecord->offset;
-    char* content = readFromFontFile(fileName);
-    content = content + mOffset;
+    char* content = readNumberBytesFromFile(fileName, mOffset, SEGMENT_SUBTABLE_HEADER_LENGTH);
 
     int offsetInternal = 0;
     this->mFormat = readTwoBytesAsUShort(content + offsetInternal);
@@ -38,50 +36,50 @@ SegmentMappingTable::SegmentMappingTable(const char* fileName, uint16_t platform
 
     this->mRangeShift = readTwoBytesAsUShort(content + offsetInternal);
     offsetInternal+= 2;
+    free(content);
+    content = NULL;
 
+    uint16_t subContentLength = mLength - offsetInternal;
+    uint16_t subOffset = 0;
+    char* subContent = readNumberBytesFromFile(fileName, mOffset + offsetInternal, subContentLength);
     mEndCodes = (uint16_t*)malloc(sizeof(uint16_t) * mSegCount);
     for (int i = 0; i < mSegCount; ++i) {
-        mEndCodes[i] = readTwoBytesAsUShort(content + offsetInternal);
-        offsetInternal += 2;
+        mEndCodes[i] = readTwoBytesAsUShort(subContent + subOffset);
+        subOffset += 2;
     }
-    mReservedPad = readTwoBytesAsUShort(content + offsetInternal);
-    offsetInternal += 2;
+    mReservedPad = readTwoBytesAsUShort(subContent + subOffset);
+    subOffset += 2;
 
     mStartCodes = (uint16_t*)malloc(sizeof(uint16_t) * mSegCount);
     for (int i = 0; i < mSegCount; ++i) {
-        mStartCodes[i] = readTwoBytesAsUShort(content + offsetInternal);
-        offsetInternal += 2;
+        mStartCodes[i] = readTwoBytesAsUShort(subContent + subOffset);
+        subOffset += 2;
     }
 
     mIdDeltas = (int16_t *)malloc(sizeof(uint16_t) * mSegCount);
     for (int i = 0; i < mSegCount; ++i) {
-        mIdDeltas[i] = readTwoBytesAsShort(content + offsetInternal);
-        offsetInternal += 2;
+        mIdDeltas[i] = readTwoBytesAsShort(subContent + subOffset);
+        subOffset += 2;
     }
 
-    this->mIdRangeOffsetOffset = offsetInternal;
+    this->mIdRangeOffsetOffset = offsetInternal + subOffset;
 
     mIdRangeOffsets = (uint16_t*)malloc(sizeof(uint16_t) * mSegCount);
     for (int i = 0; i < mSegCount; ++i) {
-        mIdRangeOffsets[i] = readTwoBytesAsUShort(content + offsetInternal);
-        offsetInternal += 2;
+        mIdRangeOffsets[i] = readTwoBytesAsUShort(subContent + subOffset);
+        subOffset += 2;
     }
+    free(subContent);
+    subContent = NULL;
 
-    int glyIdArrayLength = (mLength - offsetInternal) / 2;
-
-    //printf("arraryCount: %d, ArrayLength: %d\n", arraryCount, glyIdArrayLength);
-    mGlyphIdArray = (uint16_t*)malloc(sizeof(uint16_t) * mSegCount);
-    for (int i = 0; i < glyIdArrayLength; ++i) {
-        mGlyphIdArray[i] = readTwoBytesAsUShort(content + offsetInternal);
-        offsetInternal += 2;
-    }
-
+    char* segmentContent = readNumberBytesFromFile(fileName, mOffset, mLength);
     this->mRawData = (char*)malloc(sizeof(char) *(mLength + 1));
     for (int k = 0; k < mLength; ++k) {
-        mRawData[k] = content[k];
+        mRawData[k] = segmentContent[k];
     }
     mRawData[mLength] = '\0';
-
+    free(segmentContent);
+    segmentContent = NULL;
 }
 
 uint16_t SegmentMappingTable::getGlyphIndex(uint32_t characterCode){
@@ -99,8 +97,8 @@ uint16_t SegmentMappingTable::getGlyphIndex(uint32_t characterCode){
         }
     }
 
-    printf("startCode: %u, endCode: %u, idDelta: %d, idRangeOffset: %u\n",
-            startCode, endCode, idDelta, idRangeOffset);
+//    printf("startCode: %u, endCode: %u, idDelta: %d, idRangeOffset: %u\n",
+//            startCode, endCode, idDelta, idRangeOffset);
 
     if(idRangeOffset){
         int gid = 0;
@@ -114,6 +112,5 @@ uint16_t SegmentMappingTable::getGlyphIndex(uint32_t characterCode){
     } else {
         glyphIndex = startCode + idDelta;
     }
-    printf("glyphIndex: %u\n", glyphIndex);
     return glyphIndex;
 }

@@ -37,11 +37,15 @@ unsigned int readFourBytesAsUInt(const char* const  content){
           ((*(content + 3)) & 0xFF);
     return tmp;
 }
+
+
+static char* fontContent = NULL;
+
 char* readFromFontFile(const char* fileName){
     FILE *fp;
     int fileLength =0;
     if(fileName != NULL){
-        fp = fopen(fileName, "rt");
+        fp = fopen(fileName, "r");
         if(fp){
             fseek(fp,0,SEEK_END);
             fileLength=ftell(fp);
@@ -54,25 +58,28 @@ char* readFromFontFile(const char* fileName){
 
 
 char* readNumberBytesFromFile(const char* fileName, unsigned int offset, unsigned int count){
-
     FILE *fp;
     char* content=NULL;
-
     int fileLength =0;
+
     if(fileName!=NULL)
     {
-        fp=fopen(fileName,"rt");
+        fp=fopen(fileName,"r");
         if(fp!=NULL)
         {
             fseek(fp,0,SEEK_END);
             fileLength=ftell(fp);
             if( (offset + count) <= fileLength){
                 fseek(fp, offset, 0);
-                if(count>0)
-                {
+
+                if(count>0) {
                     content=(char*)malloc(sizeof(char)*(count+1));
-                    count=fread(content,sizeof(char),count,fp);
-                    content[count]='\0';
+                    if(content){
+                        count=fread(content,sizeof(char),count,fp);
+                        content[count]='\0';
+                    } else {
+                        printf("readNumberBytesFromFile cannot malloc\n");
+                    }
                 }
                 fclose(fp);
             } else {
@@ -85,8 +92,6 @@ char* readNumberBytesFromFile(const char* fileName, unsigned int offset, unsigne
     }
     return content;
 }
-#define FONT_FILENAME "resources/MSYHMONO.ttf"
-
 
 DirectoryTable* getDirectoryTable(const char* fileName){
     return new DirectoryTable(fileName);

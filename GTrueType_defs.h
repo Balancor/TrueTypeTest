@@ -8,23 +8,13 @@
 #include <iostream>
 using namespace std;
 
+#define DIRECTORY_TABLE_LENGTH 12
+#define TABLE_RECORD_LENGTH 16
+#define ENCODING_TABLE_LENGTH 8
+#define MAXP_TABLE_LENGTH 32
+#define SEGMENT_SUBTABLE_HEADER_LENGTH 14
+#define HEAD_TABLE_LENGTH 54
 
-#define BYTE char
-#define CHAR char
-#define USHORT uint16_t
-#define SHORT int16_t
-#define ULONG uint32_t
-#define LONG  int32_t
-#define FUNIT uint32_t
-#define FWORD int16_t
-#define UFWORD uint16_t
-#define F2DOT14 unsigned short;
-#define LONGDATETIME int64_t
-
-typedef struct{
-    SHORT integerPart;
-    USHORT fraction;
-}FIXED;
 
 #define TAG_TO_ULONG(t1, t2, t3, t4) \
         (t1 & 0xFF) << 24 | (t2 & 0xFF) << 16 | \

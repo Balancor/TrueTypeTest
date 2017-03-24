@@ -16,7 +16,7 @@ unsigned int readFourBytesAsUInt(const char* const  content);
 
 uint32_t calcTableChecksum(uint32_t *Table, uint32_t Length);
 
-char* readFromFontFile(const char* fileName);
+//char* readFromFontFile(const char* fileName);
 char* readNumberBytesFromFile(const char* fileName, unsigned int offset, unsigned int count);
 DirectoryTable* getDirectoryTable(const char* fileName);
 CmapTable* getCmapTable(const char* fileName);
