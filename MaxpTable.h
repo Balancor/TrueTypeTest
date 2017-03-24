@@ -26,6 +26,10 @@ protected:
     uint16_t mMaxComponentDepth;
 public:
     MaxpTable(const char* fileName);
+    void setOffset(uint32_t offset){
+        mOffset = offset;
+    }
+    void dump();
 };
 
 

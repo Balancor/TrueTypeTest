@@ -23,8 +23,6 @@ public:
 
     uint16_t getGlyphOffset(uint16_t gid);
     uint16_t getGlyphLength(uint16_t gid);
-
-
 };
 
 

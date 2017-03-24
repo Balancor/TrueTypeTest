@@ -19,7 +19,6 @@ HeadTable::HeadTable(const char* fileName){
     this->mOffset = headTableRecord->offset;
     char* content = readNumberBytesFromFile(fileName, mOffset, HEAD_TABLE_LENGTH);
 
-
     mVersion = readFourBytesAsUInt(content + offset);
     offset += 4;
     mFontVersion = readFourBytesAsUInt(content + offset);
@@ -39,7 +38,6 @@ HeadTable::HeadTable(const char* fileName){
     uint64_t lowInt = readFourBytesAsUInt(content + offset);
     offset += 4;
     mCreated =  ((highInt << 32) & 0xFFFFFFFF) | lowInt ;
-
 
     highInt = readFourBytesAsUInt(content + offset);
     offset += 4;

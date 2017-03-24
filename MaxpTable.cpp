@@ -5,8 +5,6 @@
 #include "MaxpTable.h"
 #include "utils.h"
 MaxpTable::MaxpTable(const char* fileName){
-    printf("CmapTable Constructor, fileName: %s\n", fileName);
-
     DirectoryTable* directoryTable = getDirectoryTable(fileName);
     TableRecord* maxpRecord = directoryTable->getTableRecord(TABLE_TAG_MAXP);
     if(maxpRecord == NULL){
@@ -16,37 +14,65 @@ MaxpTable::MaxpTable(const char* fileName){
     this->mOffset = maxpRecord->offset;
     char* content = readNumberBytesFromFile(fileName, mOffset, MAXP_TABLE_LENGTH);
 
-    mMaxpTableVersion = readFourBytesAsUInt(content + mOffset + mLength);
+    mMaxpTableVersion = readFourBytesAsUInt(content + mLength);
+    mLength += 4;
+    mNumGlyphs = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mNumGlyphs = readTwoBytesAsUShort(content + mOffset + mLength);
+
+    if(mMaxpTableVersion == 0x5000){
+        free(content);
+        content = NULL;
+        return;
+    }
+
+    mMaxPoints = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxPoints = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxContours = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxContours = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxCompositePoints = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxCompositePoints = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxCompositeContours = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxCompositeContours = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxZones = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxZones = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxTwilightPoints = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxTwilightPoints = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxStorage = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxStorage = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxFunctionDefs = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxFunctionDefs = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxInstructionDefs = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxInstructionDefs = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxStackElements = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxStackElements = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxSizeOfInstructions = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxSizeOfInstructions = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxComponentElements = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    mMaxComponentElements = readTwoBytesAsUShort(content + mOffset + mLength);
-    mLength += 2;
-    mMaxComponentDepth = readTwoBytesAsUShort(content + mOffset + mLength);
+    mMaxComponentDepth = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
 
     free(content);
     content = NULL;
+}
+
+void MaxpTable::dump(){
+    printf("MaxpTable:\n");
+    printf("\tmMaxpTableVersion: %u\n", mMaxpTableVersion);
+    printf("\tmNumGlyphs: %u\n", mNumGlyphs);
+    if(mMaxpTableVersion == 0x5000)
+        return;
+    printf("\tmMaxPoints: %u\n", mMaxPoints);
+    printf("\tmMaxContours: %u\n", mMaxContours);
+    printf("\tmMaxCompositePoints: %u\n", mMaxCompositePoints);
+    printf("\tmMaxCompositeContours: %u\n", mMaxCompositeContours);
+    printf("\tmMaxZones: %u\n", mMaxZones);
+    printf("\tmMaxTwilightPoints: %u\n", mMaxTwilightPoints);
+    printf("\tmMaxStorage: %u\n", mMaxStorage);
+    printf("\tmMaxFunctionDefs: %u\n", mMaxFunctionDefs);
+    printf("\tmMaxInstructionDefs: %u\n", mMaxInstructionDefs);
+    printf("\tmMaxStackElements: %u\n", mMaxStackElements);
+    printf("\tmMaxSizeOfInstructions: %u\n", mMaxSizeOfInstructions);
+    printf("\tmMaxComponentElements: %u\n", mMaxComponentElements);
+    printf("\tmMaxComponentDepth: %u\n", mMaxComponentDepth);
 }
