@@ -36,6 +36,8 @@ public:
     int16_t yMin;
     int16_t xMax;
     int16_t yMax;
+
+    static uint16_t getNumOfCountors();
 };
 
 
@@ -47,6 +49,9 @@ public:
     uint8_t  *flags;
     uint16_t *xCoordinates;
     uint16_t *yCoordinates;
+    uint16_t numberOfPoints;
+
+    SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length);
 
 };
 

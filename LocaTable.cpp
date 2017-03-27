@@ -20,42 +20,46 @@ LocaTable::LocaTable(const char* fileName, bool isShort, uint16_t numGlyphs){
     int count = 0;
     if(isShortVersion){
         count = numGlyphs * sizeof(uint16_t);
+        this->mOffsets = (uint32_t*)malloc(sizeof(uint16_t) * (mNumGlyphs + 1));
     } else {
         count = numGlyphs * sizeof(uint32_t);
+        this->mOffsets = (uint32_t*)malloc(sizeof(uint32_t) * (mNumGlyphs + 1));
     }
 
     char* locaContent = readNumberBytesFromFile(fileName, mOffset, count);
 
-    mGlyphRecords = (GlyphRecord**) malloc(sizeof(void*) * (mNumGlyphs + 1));
-
-    printf("mOffset: %u\n",mOffset);
     for (int i = 0; i < mNumGlyphs; ++i) {
-        GlyphRecord* record = (GlyphRecord*)malloc(sizeof(GlyphRecord));
         if(isShortVersion){
-            record->offset = readTwoBytesAsUShort(locaContent + offsetInternal);
+            this->mOffsets[i] = readTwoBytesAsUShort(locaContent + offsetInternal);
             offsetInternal += 2;
-            uint16_t  nextOffset = readTwoBytesAsUShort(locaContent + offsetInternal);
-            record->length = nextOffset - record->offset;
-
         } else {
-            record->offset = readFourBytesAsUInt(locaContent + offsetInternal);
+            this->mOffsets[i] = readFourBytesAsUInt(locaContent + offsetInternal);
             offsetInternal += 4;
-
-            uint16_t  nextOffset = readTwoBytesAsUShort(locaContent + offsetInternal);
-            record->length = nextOffset - record->offset;
-        }
-        mGlyphRecords[i] = record;
-        if(i < 20){
-            printf("Offset: %u, Length: %u\n",record->offset, record->length);
         }
     }
 
-    GlyphRecord* record = (GlyphRecord*)malloc(sizeof(GlyphRecord));
-    record->offset = offsetInternal;
-    record->length = count - offsetInternal;
-    mGlyphRecords[mNumGlyphs] = record;
-
-
     free(locaContent);
     locaContent = NULL;
+}
+
+uint32_t LocaTable::getGlyphOffset(uint16_t gid){
+    uint32_t  offset = 0;
+    if(gid >=0 && gid < mNumGlyphs){
+        if(mOffsets){
+            offset = mOffsets[gid];
+        }
+
+    }
+    return offset;
+}
+uint32_t LocaTable::getGlyphLength(uint16_t gid){
+    uint32_t  length = 0;
+    if(gid >=0 && gid < mNumGlyphs ){
+        uint32_t nextOffset = 0;
+        if(gid < mNumGlyphs -1){
+            nextOffset = mOffsets[gid + 1];
+        }
+        length = nextOffset - mOffsets[gid];
+    }
+    return length;
 }
