@@ -47,11 +47,17 @@ public:
     uint16_t instructionLength;
     uint8_t  *instructions;
     uint8_t  *flags;
-    uint16_t *xCoordinates;
-    uint16_t *yCoordinates;
+    int16_t *xCoordinates;
+    int16_t *yCoordinates;
     uint16_t numberOfPoints;
 
+    bool *isOnCurve;
+
     SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length);
+
+    int16_t *getXCoords(){ return xCoordinates;}
+    int16_t *getYCoords(){ return yCoordinates;}
+    uint16_t getNumOfPoints(){ return numberOfPoints;}
 
 };
 
