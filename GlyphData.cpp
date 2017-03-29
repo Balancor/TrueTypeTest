@@ -112,8 +112,4 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
             yCoordinates[k] += yCoordinates[k - 1];
         }
     }
-    for (int l = 0; l < numberOfPoints; ++l) {
-        printf("%dth Coord(%d, %d)\n",l, xCoordinates[l], yCoordinates[l] );
-
-    }
 }

@@ -16,6 +16,8 @@ using namespace std;
 
 int16_t *xCoordinates = NULL;
 int16_t *yCoordinates = NULL;
+uint16_t *endPtsOfContours = NULL;
+uint16_t numberOfCountours = 0;
 int16_t  numberOfPoint = 0;
 
 void renderFunction()
@@ -30,35 +32,30 @@ void renderFunction()
     glLineWidth(1.0f);
     glColor3f(1.0, 0.0, 0.0);
 
-    glBegin(GL_POINTS);
-    if(numberOfPoint > 0){
-        for (int i = 0; i < numberOfPoint; ++i) {
-            glVertex2i(xCoordinates[i], yCoordinates[i]);
+    int pointIndex = 0;
+    for (int i = 0; i < numberOfCountours ; ++i) {
+        uint16_t pointOfCountours = endPtsOfContours[i] + 1;
+        if( i > 0 ){
+            pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
         }
-    }
-//        glVertex2i(200, 200);
-//        glVertex2i(600, 200);
-//        glVertex2i(600, 600);
-//        glVertex2i(200, 600);
-    glEnd();
-    glFlush();
 
+        glBegin(GL_LINE_LOOP);
+        for (int j = 0; j < pointOfCountours; ++j) {
+            glVertex2i(xCoordinates[pointIndex], yCoordinates[pointIndex]);
+            pointIndex++;
+        }
+        glEnd();
+        glFlush();
+    }
     glutSwapBuffers();
 }
 
 
 int main(int argc, char** argv) {
     SegmentMappingTable* segmentMappingTable = new SegmentMappingTable(FONT_FILENAME, 3, 1);
-    uint16_t  gid = segmentMappingTable->getGlyphIndex(0x4E2D);//汉字"中"的Unicode: 0x4E2D
-    printf("main glyph index: %u\n", gid);
-
+    uint16_t  gid = segmentMappingTable->getGlyphIndex(0x4E2D);//汉字"中"的Unicode: 0x4E2D, 0x4E8C
     HeadTable* headTable = new HeadTable(FONT_FILENAME);
-//    headTable->dump();
-    printf("main glyph mUnitsPerEm: %u\n", headTable->mUnitsPerEm);
-
     MaxpTable *maxpTable = new MaxpTable(FONT_FILENAME);
-//    maxpTable->dump();
-
     LocaTable* locaTable = new LocaTable(FONT_FILENAME, headTable->mIndexToLocFormat == 0 , maxpTable->mNumGlyphs);
 
 
@@ -76,12 +73,12 @@ int main(int argc, char** argv) {
         glyph = new SimpleGlyph(FONT_FILENAME, glyphDataRecord->offset + glyphOffset, glyphLength);
         xCoordinates = ((SimpleGlyph*)glyph)->getXCoords();
         yCoordinates = ((SimpleGlyph*)glyph)->getYCoords();
+        endPtsOfContours = ((SimpleGlyph*)glyph)->endPtsOfContours;
+        numberOfCountours = ((SimpleGlyph*)glyph)->numberOfCountours;
         numberOfPoint = ((SimpleGlyph*)glyph)->getNumOfPoints();
     } else {
 
     }
-
-
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
