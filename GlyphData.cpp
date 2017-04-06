@@ -6,6 +6,7 @@
 #include "GlyphData.h"
 #include "Base.h"
 #include "utils.h"
+#include "HeadTable.h"
 
 SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length){
     char* content = readNumberBytesFromFile(fileName, offset, length);
@@ -66,6 +67,10 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
         }
     }
 
+    HeadTable* headTable = new HeadTable(fileName);
+    maxXCoord = headTable->xMin; minXCoord = headTable->xMax;
+    maxYCoord = headTable->yMin; minYCoord = headTable->yMax;
+
     xCoordinates = (int16_t*)malloc(sizeof(uint16_t) * numberOfPoints);
     yCoordinates = (int16_t*)malloc(sizeof(uint16_t) * numberOfPoints);
     //fill xCoord
@@ -88,6 +93,8 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
         if(k > 0){
             xCoordinates[k] += xCoordinates[k - 1];
         }
+        if(xCoordinates[k] > maxXCoord) maxXCoord = xCoordinates[k];
+        if(xCoordinates[k] < minXCoord) minXCoord = xCoordinates[k];
     }
 
     //fill yCoord
@@ -111,5 +118,8 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
         if(k > 0){
             yCoordinates[k] += yCoordinates[k - 1];
         }
+
+        if(yCoordinates[k] > maxYCoord) maxYCoord = yCoordinates[k];
+        if(yCoordinates[k] < minYCoord) minYCoord = yCoordinates[k];
     }
 }

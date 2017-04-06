@@ -14,6 +14,7 @@ using namespace std;
 #define MAXP_TABLE_LENGTH 32
 #define SEGMENT_SUBTABLE_HEADER_LENGTH 14
 #define HEAD_TABLE_LENGTH 54
+#define HHEA_TABLE_LENGTH 36
 
 
 #define TAG_TO_ULONG(t1, t2, t3, t4) \

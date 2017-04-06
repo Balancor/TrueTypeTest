@@ -51,6 +51,9 @@ public:
     int16_t *yCoordinates;
     uint16_t numberOfPoints;
 
+    int16_t maxXCoord = 0, minXCoord = 0,
+            maxYCoord = 0, minYCoord = 0;
+
     bool *isOnCurve;
 
     SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length);
@@ -58,6 +61,21 @@ public:
     int16_t *getXCoords(){ return xCoordinates;}
     int16_t *getYCoords(){ return yCoordinates;}
     uint16_t getNumOfPoints(){ return numberOfPoints;}
+
+    int16_t  getMaxXCoord(){
+        return maxXCoord;
+    }
+    int16_t  getMinXCoord(){
+        return minXCoord;
+    }
+    int16_t  getMaxYCoord(){
+        return maxYCoord;
+    }
+    int16_t  getMinYCoord(){
+        return minYCoord;
+    }
+
+
 
 };
 
