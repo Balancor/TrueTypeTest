@@ -101,7 +101,7 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
         if( i > 0 ){
             pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
         }
-        printf("pointOfCountours: %u\n", pointOfCountours);
+
         for (int j = 0; j < pointOfCountours; ++j) {
             targetX = (int16_t)((xCoordinates[pointIndex] - minXCoord) * scale );
             targetY = (int16_t)((yCoordinates[pointIndex] - minYCoord) * scale );
@@ -110,8 +110,6 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
                 numOfBitmp++;
                 if(j > 0){
                     bitmap->drawLine(prevPointX, prevPointY, targetX, targetY);
-                    printf("drawLine prevPointX: %d, prevPointY: %d, targetX: %d, targetY: %d\n",
-                           prevPointX, prevPointY, targetX, targetY);
                 }
             }
             if(j == 0){
@@ -131,46 +129,33 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
     }
 
 
-
-
-//    for (int i = 0; i < numOfPoints; ++i) {
-//        targetX = (int16_t)((xCoordinates[i] - minXCoord) * scale );
-//        targetY = (int16_t)((yCoordinates[i] - minYCoord) * scale );
-//        printf("targetX: %d, targetY: %d\n", targetX, targetY);
-//        if (targetX < ppem && targetY < ppem
-//                && targetX >= 0 && targetY >= 0){
-//            numOfBitmp++;
-//            bitmap->setPointColor(targetX, targetY, 255 << 24);
-//        }
-//    }
-    printf("numOfPoints: %u, numOfBitmp: %d\n", numOfPoints, numOfBitmp);
     return bitmap;
 }
 
 void renderBitmap(){
-    //汉字"中"的Unicode: 0x4E2D, 0x4E8C
-    Bitmap* fontBitmap = getFontbitmap(0x6699);
+    //汉字"中"的Unicode: 0x4E2D, "二" 0x4E8C, "暖" 0x6696
+    Bitmap* fontBitmap = getFontbitmap(0x6696);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(-96, 96, -96, 96);
-
+    int ortho2DWidth = 96;
+    gluOrtho2D(-1 * ortho2DWidth, ortho2DWidth,
+               -1 * ortho2DWidth, ortho2DWidth);
 
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_POINTS);
     uint32_t  offset = 0;
 
-    for (int i = ppem - 1; i >= 0 ; i--) {
-        for (int j = 0; j < ppem; ++j) {
+    for (int i = 0; i < ppem ; i++) {
+        for (int j = 0; j < ppem; j++) {
             uint32_t  color = readFourBytesAsUInt((char*)(fontBitmap->mRawData + offset));
-            if(color) glVertex2i(i, j);
+            if(color) glVertex2i(j, i); // switch x, y , bitmap coord and openGL Screen coord are different
             offset += 4;
         }
     }
     glEnd();
-
     glFlush();
 
     glutSwapBuffers();
