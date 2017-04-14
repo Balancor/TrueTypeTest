@@ -16,7 +16,8 @@
 #include "HheaTable.h"
 
 #define FONT_FILENAME "resources/MSYHMONO.ttf"
-
+#define WINDOW_WIDTH  960
+#define WINDOW_HEIGHT 540
 
 using namespace std;
 
@@ -64,7 +65,7 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
 
     uint16_t advanceWidth = hmtxTable->getAdvanceWidth(gid);
     int16_t leftSideBearing = hmtxTable->getLeftSideBearing(gid);
-    printf("advanceWidth: %u, leftSideBearing: %d\n", advanceWidth, leftSideBearing);
+
     char* content = readNumberBytesFromFile(FONT_FILENAME, glyphDataRecord->offset + glyphOffset, 32);
     int16_t  numOfCountours = readTwoBytesAsUShort(content);
 
@@ -72,6 +73,7 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
     uint16_t  numOfPoints = 0;
     int16_t maxXCoord = 0, minXCoord = 0,
             maxYCoord = 0, minYCoord = 0;
+    vector<QuadraticBezierCurve> curves;
     if(numOfCountours >= 0){
         glyph = new SimpleGlyph(FONT_FILENAME, glyphDataRecord->offset + glyphOffset, glyphLength);
         xCoordinates = ((SimpleGlyph*)glyph)->getXCoords();
@@ -84,57 +86,93 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
         minXCoord = ((SimpleGlyph*)glyph)->getMinXCoord();
         maxYCoord = ((SimpleGlyph*)glyph)->getMaxYCoord();
         minYCoord = ((SimpleGlyph*)glyph)->getMinYCoord();
+
+        curves = ((SimpleGlyph*)glyph)->getQuadraticBezierCurves();
     } else {
 
     }
-
+    printf("minXCoord: %d, minYCoord: %d\n", minXCoord, minYCoord);
     Bitmap* bitmap = new Bitmap(ppem, ppem);
 
-    int numOfBitmp = 0;
-    int16_t  prevPointX = 0, prevPointY = 0;
-    int16_t  targetX = 0, targetY = 0;
-    int16_t  countoursStartX = 0, countoursStartY = 0,
-             countoursEndX = 0, countoursEndY = 0;
-    int pointIndex = 0;
-    for (int i = 0; i < numberOfCountours ; ++i) {
-        uint16_t pointOfCountours = endPtsOfContours[i] + 1;
-        if( i > 0 ){
-            pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
-        }
+    vector<QuadraticBezierCurve>::iterator it;
+    for( it = curves.begin(); it != curves.end(); it++ ){
+        Point *startPoint, *controlPoint, *endPoint;
+        startPoint = new Point((it->startPoint->x - minXCoord) * scale,
+                               (it->startPoint->y - minYCoord) * scale);
+        printf("\nstartPoint:");
+        startPoint->dump();
 
-        for (int j = 0; j < pointOfCountours; ++j) {
-            targetX = (int16_t)((xCoordinates[pointIndex] - minXCoord) * scale );
-            targetY = (int16_t)((yCoordinates[pointIndex] - minYCoord) * scale );
-            if (targetX < ppem && targetY < ppem
-                && targetX >= 0 && targetY >= 0){
-                numOfBitmp++;
-                if(j > 0){
-                    bitmap->drawLine(prevPointX, prevPointY, targetX, targetY);
-                }
-            }
-            if(j == 0){
-                countoursStartX = targetX; countoursStartY = targetY;
-            } else if (j == (pointOfCountours - 1)){
-                countoursEndX = targetX; countoursEndY = targetY;
-                bitmap->drawLine(countoursEndX,countoursEndY,countoursStartX, countoursStartY);
-            }
+        controlPoint = new Point((it->controlPoint->x - minXCoord) * scale,
+                               (it->controlPoint->y - minYCoord) * scale);
+        printf("\ncontrolPoint:");
+        printf("xCoord: %d\n", (it->controlPoint->x - minXCoord) * scale);
+        controlPoint->dump();
 
 
-            prevPointX = targetX;
-            prevPointY = targetY;
 
-            pointIndex++;
-        }
-
+        endPoint = new Point((it->endPoint->x - minXCoord) * scale,
+                               (it->endPoint->y - minYCoord) * scale);
+        printf("\nendPoint:");
+        endPoint->dump();
+        bitmap->drawQuadraticBezier(*startPoint, *controlPoint, *endPoint);
     }
 
 
+/*
+    Point *bezierStartPoint, *bezierControlPoint, *bezierEndPoint;
+    uint8_t bezierStartPointFlag, bezierControlPointFlag, bezierEndPointFla;
+
+    int pointIndex = 0;
+    for (int i = 0; i < numberOfCountours ; ++i) {
+        uint16_t pointOfCountours = endPtsOfContours[i] + 1;
+        if (i > 0) {
+            pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
+        }
+
+        Point *startPointOfCountours = new Point(((xCoordinates[pointIndex] - minXCoord) * scale),
+                                                 ((yCoordinates[pointIndex] - minYCoord) * scale));
+
+        bool isBezier = false;
+        printf("pointOfCountours: %u\n", pointOfCountours);
+        for (int j = 0; j < pointOfCountours; ++j) {
+            bezierStartPoint = new Point(((xCoordinates[pointIndex] - minXCoord) * scale),
+                                         ((yCoordinates[pointIndex] - minYCoord) * scale));
+            bezierStartPointFlag = flags[pointIndex];
+
+            bezierControlPoint = new Point(((xCoordinates[pointIndex + 1] - minXCoord) * scale),
+                                           ((yCoordinates[pointIndex + 1] - minYCoord) * scale));
+            bezierControlPointFlag = flags[pointIndex];
+
+            if (bezierStartPointFlag & SIMPLE_FLAG_ON_CUREVE) isBezier = true;
+            if (bezierControlPointFlag & SIMPLE_FLAG_ON_CUREVE != 0 && isBezier) {
+                printf("drawLine:\n");
+                bitmap->drawLine(*bezierStartPoint, *bezierControlPoint);
+                pointIndex++;
+                isBezier = false;
+                continue;
+            }
+
+            bezierEndPoint = new Point(((xCoordinates[pointIndex + 2] - minXCoord) * scale),
+                                       ((yCoordinates[pointIndex + 2] - minYCoord) * scale));
+            bezierEndPointFla = flags[pointIndex];
+
+            if (bezierEndPointFla & SIMPLE_FLAG_ON_CUREVE == 0) {
+                bezierEndPoint = new Point((bezierControlPoint->x + bezierEndPoint->x) / 2,
+                                           (bezierControlPoint->y + bezierEndPoint->y) / 2
+                );
+            }
+            printf("drawBezier:\n");
+            pointIndex++;
+            bitmap->drawQuadraticBezier(*bezierStartPoint, *bezierControlPoint, *bezierEndPoint);
+        }
+    }
+    */
     return bitmap;
 }
 
 void renderBitmap(){
-    //汉字"中"的Unicode: 0x4E2D, "二" 0x4E8C, "暖" 0x6696
-    Bitmap* fontBitmap = getFontbitmap(0x6696);
+    //汉字"中"的Unicode: 0x4E2D, "二" 0x4E8C, "暖" 0x6696  "人" 0x4EBA "又" 0x53C8
+    Bitmap* fontBitmap = getFontbitmap(0x53C8);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -159,6 +197,63 @@ void renderBitmap(){
     glFlush();
 
     glutSwapBuffers();
+}
+
+void testBitmap(){
+    int bitmapWidth, bitmapHeight;
+    bitmapHeight = WINDOW_HEIGHT;
+    bitmapWidth = WINDOW_WIDTH;
+    Bitmap* testBitmap = new Bitmap(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    /*for test Bezier*/
+    Point startPoint(100, 300);
+    Point controlPoint(400, 300);
+    Point endPoint(400,300);
+    testBitmap->drawQuadraticBezier(startPoint, controlPoint, endPoint);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-1 * bitmapWidth, bitmapWidth,
+               -1 * bitmapHeight, bitmapHeight);
+
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_POINTS);
+    uint32_t  offset = 0;
+
+    for (int i = 0; i < bitmapHeight ; i++) {
+        for (int j = 0; j < bitmapWidth; j++) {
+            uint32_t  color = readFourBytesAsUInt((char*)(testBitmap->mRawData + offset));
+            if(color) glVertex2i(j, i); // switch x, y , bitmap coord and openGL Screen coord are different
+            offset += 4;
+        }
+    }
+    glEnd();
+    glFlush();
+
+    glutSwapBuffers();
+}
+
+void renderBezier(){
+    Point *bezierStartPoint, *bezierControlPoint, *bezierEndPoint;
+    uint8_t bezierStartPointFlag, bezierControlPointFlag, bezierEndPointFla;
+
+
+    int pointIndex = 0;
+    int pointOfCountours = 24;
+    int onCurvePoints = 2;
+    for (int j = 0; j < pointOfCountours; ++j) {
+        uint8_t  pointFlag = flags[pointIndex];
+
+
+        if(pointFlag & SIMPLE_FLAG_ON_CUREVE != 0){
+            onCurvePoints--;
+        }
+
+
+
+    }
 }
 
 
@@ -194,46 +289,15 @@ void renderFunction()
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(960,540);
+    glutInitWindowSize(WINDOW_WIDTH,WINDOW_HEIGHT);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Sketch");
     glewInit();
-
-
 
     glClearColor(0.0,0.0,0.0,0.0);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
 
-    /*
-    //汉字"中"的Unicode: 0x4E2D, 0x4E8C
-    Bitmap* fontBitmap = getFontbitmap(0x4E2D);
-
-
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    glGenTextures(1, &fontTextureId);
-
-    glBindTexture(GL_TEXTURE_2D, fontTextureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RGBA,
-                 ppem,
-                 ppem,
-                 0,
-                 GL_RGBA,
-                 GL_UNSIGNED_BYTE,
-                 fontBitmap);
-*/
-
-//    glutDisplayFunc(renderFunction);
     glutDisplayFunc(renderBitmap);
     glutMainLoop();
 

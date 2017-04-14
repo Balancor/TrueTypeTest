@@ -71,8 +71,8 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
     maxXCoord = headTable->xMin; minXCoord = headTable->xMax;
     maxYCoord = headTable->yMin; minYCoord = headTable->yMax;
 
-    xCoordinates = (int16_t*)malloc(sizeof(uint16_t) * numberOfPoints);
-    yCoordinates = (int16_t*)malloc(sizeof(uint16_t) * numberOfPoints);
+    xCoordinates = (int16_t*)malloc(sizeof(int16_t) * numberOfPoints);
+    yCoordinates = (int16_t*)malloc(sizeof(int16_t) * numberOfPoints);
     //fill xCoord
     for (int k = 0; k < numberOfPoints; ++k) {
         flag = flags[k];
@@ -122,4 +122,70 @@ SimpleGlyph::SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length)
         if(yCoordinates[k] > maxYCoord) maxYCoord = yCoordinates[k];
         if(yCoordinates[k] < minYCoord) minYCoord = yCoordinates[k];
     }
+
+    initQuadraticBezierCurves();
+}
+
+void SimpleGlyph::initQuadraticBezierCurves(){
+    int pointIndex = 0;
+    int curveLocation = 0;
+    printf("all point numbers: %d,\n", numberOfPoints);
+    for(int i = 0; i < numberOfPoints; i++){
+        printf("%dth (%d, %d)onCurve: %d\n", i,xCoordinates[i], yCoordinates[i],  isOnCurve[i]);
+    }
+    for (int i = 0; i < numberOfCountours ; ++i) {
+        uint16_t pointOfCountours = endPtsOfContours[i] + 1;
+        if (i > 0) {
+            pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
+        }
+
+        printf("countours index: %d, pointOfCountours: %d\n",i, pointOfCountours);
+        //for (int j = 0; j < pointOfCountours; j++)
+        int j = 0;
+        while ( j < pointOfCountours) {
+            printf("j: %d\n",j);
+            Point *startPoint, *nextPoint;
+            if(j > 0) {
+                startPoint = mQuadraticBezierCurves.at(curveLocation - 1).endPoint;
+            } else if(j == 0){
+                startPoint = new Point(xCoordinates[pointIndex], yCoordinates[pointIndex]);
+                pointIndex++;
+                j++;
+            }
+
+
+
+            QuadraticBezierCurve quadraticBezierCurve;
+            quadraticBezierCurve.startPoint = startPoint;
+            printf("nextPointLocation: %d\n", pointIndex);
+            nextPoint =  new Point(xCoordinates[pointIndex], yCoordinates[pointIndex]);
+            bool nextOnCurve = isOnCurve[pointIndex];
+
+
+            printf("pointIndex: %d,nextOnCurve: %d\n",pointIndex - 1,  nextOnCurve);
+            if (nextOnCurve) {
+                quadraticBezierCurve.controlPoint = nextPoint;
+                quadraticBezierCurve.endPoint = nextPoint;
+            } else {
+                Point *tempPoint = new Point(xCoordinates[pointIndex], yCoordinates[pointIndex]);
+                bool tempOnCurve = isOnCurve[pointIndex];
+                if (tempOnCurve) {
+                    quadraticBezierCurve.endPoint = tempPoint;
+                } else {
+                    int16_t xCoord = (nextPoint->x + tempPoint->x) / 2;
+                    int16_t yCoord = (nextPoint->y + tempPoint->y) / 2;
+                    quadraticBezierCurve.endPoint = new Point(xCoord, yCoord);
+                }
+            }
+            /*
+            printf("Curve index: %d\n", curveLocation);
+            quadraticBezierCurve.startPoint->dump();
+            quadraticBezierCurve.controlPoint->dump();
+            quadraticBezierCurve.endPoint->dump();
+             */
+            mQuadraticBezierCurves.push_back(quadraticBezierCurve);
+            curveLocation++;
+        }
+    }
+    printf("initQuadraticBezierCurves END\n");
 }

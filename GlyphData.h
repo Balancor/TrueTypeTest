@@ -6,6 +6,9 @@
 #define GTRUETYPE_GLYPHDATA_H
 
 #include <stdint-gcc.h>
+#include <list>
+#include <vector>
+#include "Base.h"
 
 #define SIMPLE_FLAG_ON_CUREVE 1 << 0
 #define SIMPLE_FLAG_X_SHORT   1 << 1
@@ -28,6 +31,14 @@
 #define WE_HAVE_INSTRUCTIONS     1 << 8
 #define USE_MY_METRICS           1 << 9
 
+using namespace std;
+
+typedef struct{
+    Point* startPoint;
+    Point* controlPoint;
+    Point* endPoint;
+} QuadraticBezierCurve;
+
 
 class Glyph {
 public:
@@ -49,12 +60,14 @@ public:
     uint8_t  *flags;
     int16_t *xCoordinates;
     int16_t *yCoordinates;
+
     uint16_t numberOfPoints;
 
     int16_t maxXCoord = 0, minXCoord = 0,
             maxYCoord = 0, minYCoord = 0;
 
     bool *isOnCurve;
+    vector<QuadraticBezierCurve> mQuadraticBezierCurves;
 
     SimpleGlyph(const char* fileName, uint32_t offset, uint32_t length);
 
@@ -75,7 +88,13 @@ public:
         return minYCoord;
     }
 
+    void initQuadraticBezierCurves();
 
+
+
+    vector<QuadraticBezierCurve> getQuadraticBezierCurves(){
+        return mQuadraticBezierCurves;
+    }
 
 };
 
