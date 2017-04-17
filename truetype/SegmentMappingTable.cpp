@@ -4,7 +4,7 @@
 
 #include <cstring>
 #include "SegmentMappingTable.h"
-#include "utils.h"
+#include "../utils.h"
 #include "GTrueType_defs.h"
 
 SegmentMappingTable::SegmentMappingTable(const char* fileName, uint16_t platformId, uint16_t encodingId){
@@ -97,9 +97,6 @@ uint16_t SegmentMappingTable::getGlyphIndex(uint32_t characterCode){
         }
     }
 
-//    printf("startCode: %u, endCode: %u, idDelta: %d, idRangeOffset: %u\n",
-//            startCode, endCode, idDelta, idRangeOffset);
-
     if(idRangeOffset){
         int gid = 0;
         uint16_t gidOffset = idRangeOffset + mIdRangeOffsetOffset + 2 * (characterCode - startCode);
@@ -112,5 +109,6 @@ uint16_t SegmentMappingTable::getGlyphIndex(uint32_t characterCode){
     } else {
         glyphIndex = startCode + idDelta;
     }
+
     return glyphIndex;
 }

@@ -6,8 +6,15 @@
 #define GTRUETYPE_UTILS_H
 
 #include <iostream>
-#include "Base.h"
-#include "CmapTable.h"
+#include "truetype/Base.h"
+#include "truetype/CmapTable.h"
+#include "truetype/SegmentMappingTable.h"
+#include "truetype/HeadTable.h"
+#include "truetype/MaxpTable.h"
+#include "truetype/LocaTable.h"
+#include "truetype/HheaTable.h"
+#include "truetype/HmtxTable.h"
+#include "Bitmap.h"
 
 short readTwoBytesAsShort(const char* const  content);
 unsigned short readTwoBytesAsUShort(const char* const  content);
@@ -20,5 +27,6 @@ uint32_t calcTableChecksum(uint32_t *Table, uint32_t Length);
 char* readNumberBytesFromFile(const char* fileName, unsigned int offset, unsigned int count);
 DirectoryTable* getDirectoryTable(const char* fileName);
 CmapTable* getCmapTable(const char* fileName);
+
 
 #endif //GTRUETYPE_UTILS_H

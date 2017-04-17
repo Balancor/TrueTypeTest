@@ -5,7 +5,7 @@
 #include <cstring>
 #include "GlyphData.h"
 #include "Base.h"
-#include "utils.h"
+#include "../utils.h"
 #include "HeadTable.h"
 
 SimpleGlyph::SimpleGlyph(const char *fileName, uint32_t offset, uint32_t length) {
@@ -131,16 +131,13 @@ SimpleGlyph::SimpleGlyph(const char *fileName, uint32_t offset, uint32_t length)
 void SimpleGlyph::initQuadraticBezierCurves() {
     int pointIndex = 0;
     int curveLocation = 0;
-//    printf("all point numbers: %d,\n", numberOfPoints);
-//    for (int i = 0; i < numberOfPoints; i++) {
-//        printf("%dth (%d, %d)onCurve: %d\n", i, xCoordinates[i], yCoordinates[i], isOnCurve[i]);
-//    }
+
     for (int i = 0; i < numberOfCountours; ++i) {
         uint16_t pointOfCountours = endPtsOfContours[i] + 1;
         if (i > 0) {
             pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
         }
-//        printf("pointOfCountours: %d\n", pointOfCountours);
+
         Point *startPoint, *controlPoint, *endPoint;
         Point *countoursStartPoint, *countoursEndPoint;
         int j = 0;
@@ -200,7 +197,6 @@ void SimpleGlyph::initQuadraticBezierCurves() {
                     curveLocation++;
                     curveHasStartPoint = false;
                 }
-
             }
             pointIndex++;
         }
@@ -217,10 +213,6 @@ void SimpleGlyph::initQuadraticBezierCurves() {
             curve.controlPoint = countoursStartPoint;
             curve.endPoint = countoursStartPoint;
         }
-//        printf("countoursStartPoint(%d, %d),countoursControlPoint(%d, %d), countoursEndPoint(%d, %d)\n",
-//               curve.startPoint->x, curve.startPoint->y,
-//               curve.controlPoint->x, curve.controlPoint->y,
-//               curve.endPoint->x, curve.endPoint->y);
         mQuadraticBezierCurves.push_back(curve);
         curveLocation++;
     }

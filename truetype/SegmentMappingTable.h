@@ -21,7 +21,6 @@ protected:
     uint16_t 	*mStartCodes;
     int16_t 	*mIdDeltas;
     uint16_t 	*mIdRangeOffsets;
-//    uint16_t 	*mGlyphIdArray;
 
     uint16_t mIdRangeOffsetOffset;
 

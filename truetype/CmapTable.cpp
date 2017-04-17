@@ -4,7 +4,7 @@
 #include <cstring>
 #include "GTrueType_defs.h"
 #include "CmapTable.h"
-#include "utils.h"
+#include "../utils.h"
 #include "Base.h"
 
 CmapTable::CmapTable(const char* fileName){

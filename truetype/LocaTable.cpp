@@ -3,7 +3,7 @@
 //
 
 #include "LocaTable.h"
-#include "utils.h"
+#include "../utils.h"
 #include "GTrueType_defs.h"
 LocaTable::LocaTable(const char* fileName, bool isShort, uint16_t numGlyphs){
     DirectoryTable* directoryTable = getDirectoryTable(fileName);

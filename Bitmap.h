@@ -7,7 +7,7 @@
 
 
 #include <cstdint>
-#include "Base.h"
+#include "truetype/Base.h"
 
 #define FLAG_POINT_DRAWED  1
 
@@ -36,6 +36,15 @@ public:
 
 
     void drawQuadraticBezier(Point startPoint, Point controlPoint, Point endPoint);
+
+    uint32_t getWidth(){
+        return mWidth;
+    }
+
+    uint32_t getHeight(){
+        return mHeight;
+    }
+
 
 };
 

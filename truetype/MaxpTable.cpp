@@ -3,7 +3,7 @@
 //
 #include "GTrueType_defs.h"
 #include "MaxpTable.h"
-#include "utils.h"
+#include "../utils.h"
 MaxpTable::MaxpTable(const char* fileName){
     DirectoryTable* directoryTable = getDirectoryTable(fileName);
     TableRecord* maxpRecord = directoryTable->getTableRecord(TABLE_TAG_MAXP);
@@ -54,7 +54,7 @@ MaxpTable::MaxpTable(const char* fileName){
     mLength += 2;
     mMaxComponentDepth = readTwoBytesAsUShort(content + mLength);
     mLength += 2;
-    printf("MaxpTable Constructor END\n");
+
     free(content);
     content = NULL;
 }

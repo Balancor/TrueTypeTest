@@ -33,14 +33,7 @@
 
 using namespace std;
 
-typedef struct{
-    Point* startPoint;
-    Point* controlPoint;
-    Point* endPoint;
-} QuadraticBezierCurve;
-
-
-class Glyph {
+class GlyphDataHeader {
 public:
     int16_t numberOfCountours;
     int16_t xMin;
@@ -52,7 +45,7 @@ public:
 };
 
 
-class SimpleGlyph : public Glyph{
+class SimpleGlyph : public GlyphDataHeader{
 public:
     uint16_t *endPtsOfContours;
     uint16_t instructionLength;
@@ -89,16 +82,13 @@ public:
     }
 
     void initQuadraticBezierCurves();
-
-
-
     vector<QuadraticBezierCurve> getQuadraticBezierCurves(){
         return mQuadraticBezierCurves;
     }
 
 };
 
-class CompoundGlyph : public Glyph {
+class CompoundGlyph : public GlyphDataHeader {
 
 };
 

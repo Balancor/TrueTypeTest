@@ -3,7 +3,7 @@
 //
 
 #include "HheaTable.h"
-#include "utils.h"
+#include "../utils.h"
 #include "GTrueType_defs.h"
 #include "Base.h"
 

@@ -71,7 +71,6 @@ void Bitmap::drawLine(uint32_t startX, uint32_t startY, uint32_t endX, uint32_t 
     int uy = ((dy > 0) << 1) - 1;
     int x = startX, y = startY, eps;
 
-    printf("startX: %u, startY: %u, endX: %u, endY: %u\n",startX, startY, endX, endY);
     eps = 0;dx = abs(dx); dy = abs(dy);
     if (dx > dy) {
         for (x = startX; x != endX; x += ux) {
@@ -98,17 +97,12 @@ void Bitmap::drawLine(Point startPoint, Point endPoint){
 }
 
 void Bitmap::drawQuadraticBezier(Point startPoint, Point controlPoint, Point endPoint){
-    printf("drawQuadraticBezier START\n");
-    startPoint.dump();
-    controlPoint.dump();
-    endPoint.dump();
     float step = 0.01;
     Point p1, p2, targetPoint;
     for (float per= 0; per < 1; per+=step) {
         p1 = startPoint.getLocationAtLine(controlPoint, per);
         p2 = controlPoint.getLocationAtLine(endPoint, per);
         targetPoint = p1.getLocationAtLine(p2, per);
-//        targetPoint.dump();
         setPointColor(targetPoint,255 << 24);
     }
 }

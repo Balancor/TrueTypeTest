@@ -1,6 +1,6 @@
 // Created by guoguo on 17-3-23.
 #include "Base.h"
-#include "utils.h"
+#include "../utils.h"
 #include "GTrueType_defs.h"
 DirectoryTable::DirectoryTable(const char* fontFileName){
     char* content = readNumberBytesFromFile(fontFileName, 0, DIRECTORY_TABLE_LENGTH); //readFromFontFile(fontFileName);

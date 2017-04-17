@@ -1,7 +1,10 @@
 //
 // Created by guoguo on 17-3-23.
 //
+#include <vector>
 #include "utils.h"
+#include "truetype/GTrueType_defs.h"
+#include "Glyph.h"
 using namespace std;
 
 short readTwoBytesAsShort(const char* const  content){

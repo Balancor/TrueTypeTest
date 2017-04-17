@@ -42,7 +42,7 @@ public:
 
 
 class Table{
-protected:
+public:
     uint32_t mOffset;
     uint32_t mLength;
     char* mRawData;
@@ -137,6 +137,12 @@ public:
     }
 };
 
+
+typedef struct{
+    Point* startPoint;
+    Point* controlPoint;
+    Point* endPoint;
+} QuadraticBezierCurve;
 
 
 #endif //GTRUETYPE_BASE_H

@@ -18,7 +18,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp GTrueType_defs.h utils.h Base.h CmapTable.cpp CmapTable.h Tables.h ByteEncodingTable.cpp ByteEncodingTable.h SegmentMappingTable.cpp SegmentMappingTable.h utils.cpp Base.cpp LocaTable.cpp LocaTable.h MaxpTable.cpp MaxpTable.h HeadTable.cpp HeadTable.h GlyphData.cpp GlyphData.h GlyphData.cpp Bitmap.cpp Bitmap.h HmtxTable.cpp HmtxTable.h HheaTable.cpp HheaTable.h)
+set(SOURCE_FILES main.cpp truetype/GTrueType_defs.h utils.h truetype/Base.h truetype/CmapTable.cpp truetype/CmapTable.h truetype/Tables.h truetype/ByteEncodingTable.cpp truetype/ByteEncodingTable.h truetype/SegmentMappingTable.cpp truetype/SegmentMappingTable.h utils.cpp truetype/Base.cpp truetype/LocaTable.cpp truetype/LocaTable.h truetype/MaxpTable.cpp truetype/MaxpTable.h truetype/HeadTable.cpp truetype/HeadTable.h truetype/GlyphData.cpp truetype/GlyphData.h truetype/GlyphData.cpp Bitmap.cpp Bitmap.h truetype/HmtxTable.cpp truetype/HmtxTable.h truetype/HheaTable.cpp truetype/HheaTable.h Glyph.cpp Glyph.h FontUtils.cpp FontUtils.h)
 add_executable(GTrueType ${SOURCE_FILES})
 
 target_link_libraries(GTrueType

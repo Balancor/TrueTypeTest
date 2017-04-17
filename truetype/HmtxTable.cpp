@@ -4,7 +4,7 @@
 
 #include <cstring>
 #include "HmtxTable.h"
-#include "utils.h"
+#include "../utils.h"
 #include "GTrueType_defs.h"
 
 HmtxTable::HmtxTable(const char* fileName, uint32_t numOfHMetrics, uint32_t numOfGlyphs){
