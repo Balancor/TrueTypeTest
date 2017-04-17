@@ -116,63 +116,12 @@ Bitmap* getFontbitmap(uint32_t symbolCode){
         endPoint->dump();
         bitmap->drawQuadraticBezier(*startPoint, *controlPoint, *endPoint);
     }
-
-
-/*
-    Point *bezierStartPoint, *bezierControlPoint, *bezierEndPoint;
-    uint8_t bezierStartPointFlag, bezierControlPointFlag, bezierEndPointFla;
-
-    int pointIndex = 0;
-    for (int i = 0; i < numberOfCountours ; ++i) {
-        uint16_t pointOfCountours = endPtsOfContours[i] + 1;
-        if (i > 0) {
-            pointOfCountours = endPtsOfContours[i] - endPtsOfContours[i - 1];
-        }
-
-        Point *startPointOfCountours = new Point(((xCoordinates[pointIndex] - minXCoord) * scale),
-                                                 ((yCoordinates[pointIndex] - minYCoord) * scale));
-
-        bool isBezier = false;
-        printf("pointOfCountours: %u\n", pointOfCountours);
-        for (int j = 0; j < pointOfCountours; ++j) {
-            bezierStartPoint = new Point(((xCoordinates[pointIndex] - minXCoord) * scale),
-                                         ((yCoordinates[pointIndex] - minYCoord) * scale));
-            bezierStartPointFlag = flags[pointIndex];
-
-            bezierControlPoint = new Point(((xCoordinates[pointIndex + 1] - minXCoord) * scale),
-                                           ((yCoordinates[pointIndex + 1] - minYCoord) * scale));
-            bezierControlPointFlag = flags[pointIndex];
-
-            if (bezierStartPointFlag & SIMPLE_FLAG_ON_CUREVE) isBezier = true;
-            if (bezierControlPointFlag & SIMPLE_FLAG_ON_CUREVE != 0 && isBezier) {
-                printf("drawLine:\n");
-                bitmap->drawLine(*bezierStartPoint, *bezierControlPoint);
-                pointIndex++;
-                isBezier = false;
-                continue;
-            }
-
-            bezierEndPoint = new Point(((xCoordinates[pointIndex + 2] - minXCoord) * scale),
-                                       ((yCoordinates[pointIndex + 2] - minYCoord) * scale));
-            bezierEndPointFla = flags[pointIndex];
-
-            if (bezierEndPointFla & SIMPLE_FLAG_ON_CUREVE == 0) {
-                bezierEndPoint = new Point((bezierControlPoint->x + bezierEndPoint->x) / 2,
-                                           (bezierControlPoint->y + bezierEndPoint->y) / 2
-                );
-            }
-            printf("drawBezier:\n");
-            pointIndex++;
-            bitmap->drawQuadraticBezier(*bezierStartPoint, *bezierControlPoint, *bezierEndPoint);
-        }
-    }
-    */
     return bitmap;
 }
 
 void renderBitmap(){
     //汉字"中"的Unicode: 0x4E2D, "二" 0x4E8C, "暖" 0x6696  "人" 0x4EBA "又" 0x53C8
-    Bitmap* fontBitmap = getFontbitmap(0x53C8);
+    Bitmap* fontBitmap = getFontbitmap(0x6696);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
